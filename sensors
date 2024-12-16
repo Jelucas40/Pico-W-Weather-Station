@@ -1,0 +1,30 @@
+from machine import I2C, Pin
+import bme280
+
+# Initialize I2C
+i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=100000)  # Adjust pins and frequency as needed
+
+# Scan for I2C devices
+devices = i2c.scan()
+if devices:
+    print(f"I2C devices found: {[hex(dev) for dev in devices]}")
+else:
+    print("No I2C devices found. Check your connections!")
+    raise SystemExit()
+
+# Initialize BME280
+try:
+    address = devices[0]  # Use the first detected device
+    print(f"Using BME280 address: {hex(address)}")
+    bme = bme280.BME280(i2c=i2c, address=address)
+    print("BME280 initialized successfully!")
+except Exception as e:
+    print(f"Error initializing BME280: {e}")
+    raise
+
+# Read and display sensor data
+try:
+    print("Temperature, Pressure, Humidity:")
+    print(bme.values)
+except Exception as e:
+    print(f"Error reading BME280 data: {e}")
